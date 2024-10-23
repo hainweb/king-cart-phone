@@ -1,3 +1,109 @@
+/*premium loader */
+
+@keyframes wave {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.2); opacity: 1; }
+  }
+  
+  @keyframes orbit {
+    0% { transform: rotate(0deg) translateX(50px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
+  }
+  
+  @keyframes hue-shift {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+  
+  .premium-loader {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    animation: hue-shift 5s linear infinite;
+  }
+  
+  .center-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px;
+    height: 30px;
+    background-color: #007bff;
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.6);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  
+  .orbital {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    background-color: #17a2b8;
+    border-radius: 50%;
+    animation: orbit 2.5s linear infinite;
+    box-shadow: 0 0 10px rgba(23, 162, 184, 0.7);
+  }
+  
+  .orbital:nth-child(1) {
+    animation-duration: 2.5s;
+  }
+  
+  .orbital:nth-child(2) {
+    animation-duration: 3s;
+    animation-delay: -0.5s;
+  }
+  
+  .orbital:nth-child(3) {
+    animation-duration: 3.5s;
+    animation-delay: -1s;
+  }
+  
+  .ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border: 2px solid rgba(0, 123, 255, 0.4);
+    border-radius: 50%;
+    animation: ripple 2s linear infinite;
+  }
+  
+  @keyframes ripple {
+    0% {
+      transform: translate(-50%, -50%) scale(0.8);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1.4);
+      opacity: 0;
+    }
+  }
+  
+  .shine {
+    position: absolute;
+    background: linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.1), transparent);
+    width: 60%;
+    height: 100%;
+    transform: skewX(-20deg);
+    animation: shine 2.5s infinite;
+  }
+  
+  @keyframes shine {
+    0% { transform: translateX(-100%) skewX(-20deg); }
+    100% { transform: translateX(200%) skewX(-20deg); }
+  }
+  
+
 /*Loading*/
 
 .loading-spinner {
@@ -7,47 +113,61 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    perspective: 800px;
   }
-
+  
   .spinner-segment {
     position: absolute;
     width: 100%;
     height: 100%;
     border-radius: 50%;
     border: 3px solid transparent;
-    border-top-color: #0ff;
-    animation: spin 1s cubic-bezier(0.17, 0.67, 0.83, 0.67) infinite;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    border-top-color: rgba(99, 102, 241, 0.9);
+    animation: spin 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    backdrop-filter: blur(5px);
   }
-
+  
   .spinner-segment:nth-child(1) {
     animation-delay: 0s;
+    filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.3));
   }
-
+  
   .spinner-segment:nth-child(2) {
-    width: 80%;
-    height: 80%;
-    border-top-color: #f0f;
-    animation-delay: 0.15s;
+    width: 75%;
+    height: 75%;
+    border-top-color: rgba(244, 114, 182, 0.9);
+    animation-delay: 0.2s;
     animation-direction: reverse;
+    filter: drop-shadow(0 0 15px rgba(244, 114, 182, 0.3));
   }
-
+  
   .spinner-segment:nth-child(3) {
-    width: 60%;
-    height: 60%;
-    border-top-color: #0f0;
-    animation-delay: 0.3s;
+    width: 50%;
+    height: 50%;
+    border-top-color: rgba(34, 211, 238, 0.9);
+    animation-delay: 0.4s;
+    filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.3));
   }
-
+  
   @keyframes spin {
     0% {
-      transform: rotate(0deg);
+      transform: rotateY(0deg) rotate(0deg);
+    }
+    50% {
+      transform: rotateY(60deg) rotate(180deg);
     }
     100% {
-      transform: rotate(360deg);
+      transform: rotateY(0deg) rotate(360deg);
     }
   }
-
+  
+  /* Glass morphism effect on hover */
+  .loading-spinner:hover .spinner-segment {
+    border-width: 4px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+  
   @media screen and (max-width: 768px) {
     .loading-spinner {
       width: 90px;
@@ -57,7 +177,7 @@
       border-width: 2.5px;
     }
   }
-
+  
   @media screen and (max-width: 480px) {
     .loading-spinner {
       width: 60px;
@@ -67,6 +187,10 @@
       border-width: 2px;
     }
   }
+
+  /* err msg*/
+
+
   .error-message {
     text-align: center;
     color: red;
@@ -129,7 +253,7 @@
 }
 
 .product-image {
-    width: 100%;
+    width: 95%;
     height: 100%;
     object-fit: cover;
     border-bottom: 1px solid #ddd;
@@ -139,6 +263,89 @@
 .product-card:hover .product-image {
     transform: scale(1.05);
 }
+
+/* wishlist loading*/
+
+.heart-container {
+    position: relative;
+    width: 18px;
+    height: 18px;
+  }
+
+  .heart-outline {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: 3px solid #ff3366;
+    transform: rotate(45deg);
+  }
+
+  .heart-outline::before,
+  .heart-outline::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid #ff3366;
+    border-radius: 50%;
+    box-sizing: border-box;
+  }
+
+  .heart-outline::before {
+    left: -50%;
+    border-right: none;
+  }
+
+  .heart-outline::after {
+    top: -50%;
+    border-bottom: none;
+  }
+
+  .heart-fill {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ff3366;
+    transform: rotate(45deg) scale(0.9);
+    animation: fillHeart 1.5s ease-in-out infinite;
+  }
+
+  .heart-fill::before,
+  .heart-fill::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ff3366;
+    border-radius: 50%;
+  }
+
+  .heart-fill::before {
+    left: -50%;
+  }
+
+  .heart-fill::after {
+    top: -50%;
+  }
+
+  @keyframes fillHeart {
+    0% {
+      transform: rotate(45deg) scale(0.9);
+      opacity: 0.3;
+    }
+    50% {
+      transform: rotate(45deg) scale(0.9);
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(45deg) scale(0.9);
+      opacity: 0.3;
+    }
+  }
+
+ 
+
 
 .badge {
     position: absolute;
@@ -231,7 +438,21 @@
 
 @media (max-width: 768px) {
     .product-card {
-        height: auto;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .product-image {
+        width: 70%;
+        height: 100%;
+        object-fit: cover;
+        border-bottom: 1px solid #ddd;
+        transition: transform 0.3s ease;
     }
 }
 

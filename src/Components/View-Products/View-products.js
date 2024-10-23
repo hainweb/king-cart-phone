@@ -7,10 +7,14 @@ import { Link } from 'react-router-dom';
 const ProductList = ({ setCartCount }) => {
     const [products, setProducts] = useState([]);
     const [user, setUser] = useState('');
-    const [loading, setLoading] = useState(true);  // Loading for fetching products
-    const [error, setError] = useState(null);  // Error handling for fetching products
-    const [isAddingToCart, setIsAddingToCart] = useState(false);  // Loading for add to cart operation
-    const [searchTerm, setSearchTerm] = useState('');  // State for search term
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [addingToCartProductId, setAddingToCartProductId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [wishlistLoadingId, setWishlistLoadingId] = useState(null);
+    const [sortOption, setSortOption] = useState('');
+    const [visibleProductsCount, setVisibleProductsCount] = useState(8); // Set initial visible product count
+    const [selectedProduct, setSelectedProduct] = useState(null);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -19,10 +23,7 @@ const ProductList = ({ setCartCount }) => {
                 let data = response.data.products;
                 const userdata = response.data.user;
                 setUser(userdata);
-
-                // Shuffle the products array
                 data = data.sort(() => Math.random() - 0.5);
-
                 setProducts(data);
             } catch (err) {
                 setError('Failed to load products');
@@ -34,6 +35,7 @@ const ProductList = ({ setCartCount }) => {
     }, []);
 
     const toggleWishlist = (event, productId) => {
+        setWishlistLoadingId(productId);
         event.preventDefault();
         event.stopPropagation();
         axios.get(`${BASE_URL}/add-to-Wishlist/${productId}`, { withCredentials: true }).then((response) => {
@@ -44,11 +46,12 @@ const ProductList = ({ setCartCount }) => {
                     )
                 );
             }
+            setWishlistLoadingId(null);
         });
     };
 
     const addToCart = (productId) => {
-        setIsAddingToCart(true);  // Set loading state to true when adding to cart
+        setAddingToCartProductId(productId);
         axios.get(`${BASE_URL}/add-to-cart/${productId}`, { withCredentials: true })
             .then(response => {
                 if (response.data.status) {
@@ -59,115 +62,220 @@ const ProductList = ({ setCartCount }) => {
                 console.error('Error:', error);
             })
             .finally(() => {
-                setIsAddingToCart(false);  // Reset loading state after the operation
+                setAddingToCartProductId(null);
             });
     };
 
-    // Filter and shuffle products based on search term
-    const filteredProducts = products
-        .filter(product => 
+    const handleSortChange = (e) => {
+        setSortOption(e.target.value);
+    };
+
+    const sortedProducts = products
+        .filter(product =>
             product.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             product.Category.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        )
+        .sort((a, b) => {
+            if (sortOption === 'price-asc') return a.Price - b.Price;
+            if (sortOption === 'price-desc') return b.Price - a.Price;
+            if (sortOption === 'name-asc') return a.Name.localeCompare(b.Name);
+            if (sortOption === 'name-desc') return b.Name.localeCompare(a.Name);
+            return 0;
+        });
+
+    const currentProducts = sortedProducts.slice(0, visibleProductsCount); // Show products based on visible count
+
+    const loadMoreProducts = () => {
+        setVisibleProductsCount(prevCount => prevCount + 8); // Load 8 more products
+    };
+
+    // Optional: Show browser notifications for low stock
+    useEffect(() => {
+        const checkLowStock = () => {
+            products.forEach((product) => {
+                if (product.Quantity > 0 && product.Quantity < 5) {
+                    new Notification('Low Stock Alert', {
+                        body: `Only ${product.Quantity} left of ${product.Name}`,
+                        icon: `${IMG_URL}/public/product-images/${product._id}.jpg`,
+                    });
+                }
+            });
+        };
+
+        if (Notification.permission === 'granted') {
+            checkLowStock();
+        } else if (Notification.permission !== 'denied') {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    checkLowStock();
+                }
+            });
+        }
+    }, [products]);
 
     return (
         <section className="premium-product-section">
             <div className="container mt-3">
                 {/* Search input */}
                 <div className="search-bar mb-3">
-                    <input 
-                        type="text" 
-                        className="form-control" 
-                        placeholder="Search products..." 
-                        value={searchTerm} 
-                        onChange={(e) => setSearchTerm(e.target.value)} 
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search products..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
 
+                {/* Sort dropdown */}
+                <div className="sort-bar mb-3">
+                    <select
+                        className="form-select"
+                        value={sortOption}
+                        onChange={handleSortChange}
+                    >
+                        <option value="">Sort by</option>
+                        <option value="price-asc">Price: Low to High</option>
+                        <option value="price-desc">Price: High to Low</option>
+                        <option value="name-asc">Name: A-Z</option>
+                        <option value="name-desc">Name: Z-A</option>
+                    </select>
+                </div>
+
                 {loading ? (
-                     <div className="loading-spinner">
-                    
-                     <div className="spinner-segment"></div>
-                     <div className="spinner-segment"></div>
-                     <div className="spinner-segment"></div>
-                   </div>
+                    <div className="container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <div className="premium-loader">
+                            <div className="ripple"></div>
+                            <div className="ripple" style={{ animationDelay: '-1s' }}></div>
+                            <div className="center-circle">
+                                <div className="shine"></div>
+                            </div>
+                            <div className="orbital"></div>
+                            <div className="orbital"></div>
+                            <div className="orbital"></div>
+                        </div>
+                    </div>
                 ) : error ? (
                     <div className="error-message">{error}</div>
                 ) : (
-                    <div className="row">
-                        {filteredProducts.length > 0 ? (
-                            filteredProducts.map((product) => (
-                                <div className="col-lg-3 col-md-4 col-sm-6 mb-4" key={product._id}>
-                                    <div className="product-card">
-                                        {user && (
-                                            <div className="wishlist-btn">
-                                                <button
-                                                    className={`wishlist-heart ${product.isInWishlist ? 'active' : ''}`}
-                                                    onClick={(event) => toggleWishlist(event, product._id)}
-                                                >
-                                                    <i className={`fas fa-heart ${product.isInWishlist ? 'text-danger' : 'text-muted'}`}></i>
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        <div className="product-image-container">
-                                            <img
-                                                className="product-image"
-                                                src={`${IMG_URL}/public/product-images/${product._id}.jpg`}
-                                                alt={product.Name}
-                                            />
-                                            {product.Quantity < 1 ? (
-                                                <div className="badge out-of-stock">Out of Stock</div>
-                                            ) : product.Quantity < 5 ? (
-                                                <div className="badge low-stock">Only {product.Quantity} left!</div>
-                                            ) : null}
-                                        </div>
-
-                                        <div className="product-info">
-                                            <span className="product-category">{product.Category}</span>
-                                            <h5 className="product-title">{product.Name}</h5>
-                                            <p className="product-description">{product.Description}</p>
-
-                                            <div className="price-cart">
-                                                <span className="price">₹{product.Price}</span>
-                                                {product.Quantity > 0 ? (
-                                                    user ? (
-                                                        <button className="btn add-to-cart-btn" onClick={() => addToCart(product._id)}> 
-                                                            {isAddingToCart ? (
-                                                                <div className="loading-spinner">
-                                                                
-                                                                <div className="spinner-segment"></div>
-                                                                <div className="spinner-segment"></div>
-                                                                <div className="spinner-segment"></div>
-                                                              </div>
-                                                            ) : (
-                                                                <i className="fas fa-shopping-cart"> Add to Cart</i>
-                                                            )}
-                                                        </button>
-
+                    <>
+                        <div className="row">
+                            {currentProducts.length > 0 ? (
+                                currentProducts.map((product) => (
+                                    <div className="col-lg-3 col-md-4 col-sm-6 mb-4" key={product._id}>
+                                        <div className="product-card">
+                                            {user && (
+                                                <div className="wishlist-btn">
+                                                    {wishlistLoadingId === product._id ? (
+                                                        <div className="wishlist-heart">
+                                                            <div className="heart-container">
+                                                                <div className="heart-outline"></div>
+                                                                <div className="heart-fill"></div>
+                                                            </div>
+                                                        </div>
                                                     ) : (
-                                                        <Link to={'/login'}>
-                                                            <button className="btn add-to-cart-btn">
-                                                                <i className="fas fa-shopping-cart"></i> Add to Cart
+                                                        <button
+                                                            className={`wishlist-heart ${product.isInWishlist ? 'active' : ''}`}
+                                                            onClick={(event) => toggleWishlist(event, product._id)}
+                                                        >
+                                                            <i className={`fas fa-heart ${product.isInWishlist ? 'text-danger' : 'text-muted'}`}></i>
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            <div className="product-image-container">
+                                                <img
+                                                    className="product-image"
+                                                    src={`${IMG_URL}/public/product-images/${product._id}.jpg`}
+                                                    alt={product.Name}
+                                                />
+                                                {product.Quantity < 1 ? (
+                                                    <div className="badge out-of-stock">Out of Stock</div>
+                                                ) : product.Quantity < 5 ? (
+                                                    <div className="badge low-stock">Only {product.Quantity} left!</div>
+                                                ) : null}
+                                            </div>
+
+                                            <div className="product-info">
+                                                <span className="product-category">{product.Category}</span>
+                                                <h5 className="product-title">{product.Name}</h5>
+                                                <p className="product-description">{product.Description}</p>
+
+                                                <div className="price-cart">
+                                                    <span className="price">₹{product.Price}</span>
+                                                    {product.Quantity > 0 ? (
+                                                        user ? ( 
+                                                            <button style={{display:'flex',justifyContent:'center',alignItems:'center'}}
+                                                                className="btn add-to-cart-btn"
+                                                                onClick={() => addToCart(product._id)}
+                                                            >
+                                                                {addingToCartProductId === product._id ? (
+                                                                   <div style={{ borderLeftColor: 'white'}} className="spinner"></div>
+                                                                ) : (
+                                                                    <i className="fas fa-shopping-cart"> Add to cart</i>
+                                                                )}
                                                             </button>
-                                                        </Link>
-                                                    )
-                                                ) : (
-                                                    <button className="btn out-of-stock-btn" disabled>
-                                                        <i className="fas fa-times"></i> Out of Stock
-                                                    </button>
-                                                )}
+                                                        ) : (
+                                                            <Link to={'/login'}>
+                                                                <button className="btn add-to-cart-btn">
+                                                                    <i className="fas fa-shopping-cart"></i> Add to Cart
+                                                                </button>
+                                                            </Link>
+                                                        )
+                                                    ) : (
+                                                        <button className="btn out-of-stock-btn" disabled>
+                                                            <i className="fas fa-times"></i> Out of Stock
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="no-products-message">No products found.</div>
+                                ))
+                            ) : (
+                                <div className="no-products">No products found</div>
+                            )}
+                        </div>
+
+                        {/* Load More Products Button */}
+                        {visibleProductsCount < sortedProducts.length && (
+                            <div className="load-more-container text-center">
+                                <button className="btn btn-load-more" onClick={loadMoreProducts}>
+                                    Load More Products
+                                </button>
+                            </div>
                         )}
-                    </div>
+                    </>
                 )}
             </div>
+
+            {/* Quick View Modal */}
+            {selectedProduct && (
+                <div className="quick-view-modal">
+                    <div className="modal-content">
+                        <span className="close" onClick={() => setSelectedProduct(null)}>&times;</span>
+                        <div className="modal-image-container">
+                            <img
+                                className="modal-product-image"
+                                src={`${IMG_URL}/public/product-images/${selectedProduct._id}.jpg`}
+                                alt={selectedProduct.Name}
+                            />
+                        </div>
+                        <h5 className="modal-product-title">{selectedProduct.Name}</h5>
+                        <p className="modal-product-description">{selectedProduct.Description}</p>
+                        <span className="modal-price">Price: ₹{selectedProduct.Price}</span>
+                        <div className="modal-action">
+                            <button
+                                className="btn add-to-cart-btn"
+                                onClick={() => addToCart(selectedProduct._id)}
+                            >
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 };

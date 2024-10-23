@@ -1,26 +1,38 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import {BASE_URL} from '../Urls/Urls';
+import { BASE_URL } from '../Urls/Urls';
 import { Link } from 'react-router-dom';
 
 const OrderList = () => {
+  const [loading, setLoading] = useState(true)
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const fetchOrders = () => {
       axios.get(`${BASE_URL}/view-orders`, { withCredentials: true }).then((response) => {
         console.log('orders res', response.data.orders);
-        setOrders(response.data.orders); 
+        setOrders(response.data.orders);
+        setLoading(false)
       });
     };
     fetchOrders();
-  }, []);
+    
+  }, []); 
 
   return (
     <section className="order-list-section">
-      <div className="container">
-        {orders && orders.length > 0 ? (
+
+      <div className="container con">
+        {loading?
+          <div className="loading-spinner">
+
+            <div className="spinner-segment"></div>
+            <div className="spinner-segment"></div>
+            <div className="spinner-segment"></div>
+          </div>
+       : (orders && orders.length > 0 ? (
           <>
+            
             <h4 className="section-title">Ordered Items</h4>
             <div className="table-responsive">
               <table className="table table-striped table-bordered mt-5">
@@ -54,8 +66,8 @@ const OrderList = () => {
                         </td>
                       </tr>
 
- {/* Order Tracking Row */}
- <tr>
+                      {/* Order Tracking Row */}
+                      <tr>
                         <td colSpan="5">
                           <div className="row justify-content-between">
                             <div className={`order-tracking ${order.status ? 'completed' : ''}`}>
@@ -72,9 +84,9 @@ const OrderList = () => {
                             </div>
                           </div>
                         </td>
-                        
+
                       </tr>
-                    
+
 
                     </React.Fragment>
                   ))}
@@ -84,7 +96,8 @@ const OrderList = () => {
           </>
         ) : (
           <h5 className="no-orders">You don't have any orders</h5>
-        )}
+        ))
+    }
       </div>
     </section>
   );

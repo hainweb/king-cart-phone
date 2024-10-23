@@ -1,17 +1,18 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {BASE_URL} from '../Urls/Urls';
+import { BASE_URL } from '../Urls/Urls';
 import { User, Lock } from 'lucide-react';
 import './Login.css';  // Import the CSS file
 
 const Login = ({ setUser, setCartCount }) => { // Receive setCartCount prop
+  const [loading, setLoading] = useState(false) 
   const [formData, setFormData] = useState({
     Mobile: '',
     Password: '',
   });
   const [loginErr, setLoginErr] = useState('');
-  
+
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
 
@@ -34,8 +35,9 @@ const Login = ({ setUser, setCartCount }) => { // Receive setCartCount prop
   };
 
 
-  
+
   const handleSubmit = (e) => {
+    setLoading(true)
     e.preventDefault();
     axios.post(`${BASE_URL}/login`, formData, { withCredentials: true }).then((response) => {
       if (response.data.loggedIn) {
@@ -47,9 +49,11 @@ const Login = ({ setUser, setCartCount }) => { // Receive setCartCount prop
             setCartCount(cartResponse.data.cartCount); // Update cart count state
           })
           .catch((error) => console.error('Error fetching cart count:', error));
-
+ 
         navigate('/');
+        setLoading(false)
       } else {
+        setLoading(false)
         setLoginErr(response.data.message || 'Invalid mobile or password');
       }
     });
@@ -120,14 +124,23 @@ const Login = ({ setUser, setCartCount }) => { // Receive setCartCount prop
             </div>
 
             {loginErr && <p style={{ color: 'red' }}>{loginErr}</p>}
-           
+
 
             <Link to="/signup">
               <h5 className="signup-link">Don't have an account? Sign up</h5>
             </Link>
 
-            <button type="submit" className="submit-button">
-              Login
+            <button type="submit" className="submit-button"> 
+              {loading? 
+             <div className="loading-spinner">
+                    
+             <div className="spinner-segment"></div>
+             <div className="spinner-segment"></div>
+             <div className="spinner-segment"></div>
+           </div> 
+             
+            
+            : Login } Login
             </button>
           </form>
         </div>

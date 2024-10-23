@@ -1,11 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import {BASE_URL,IMG_URL} from '../Urls/Urls';
+import { BASE_URL, IMG_URL } from '../Urls/Urls';
 import { useParams } from 'react-router-dom';
 
-const OrderTracking = ({orderTrack} ) => {
-
-    
+const OrderTracking = ({ orderTrack }) => {
+   
 
     return (
         <div className="container con">
@@ -51,27 +50,27 @@ const OrderTracking = ({orderTrack} ) => {
 const ProductCard = ({ products }) => {
     return (
         <div className="container">
-        <div className="row">
-            {products? products.map((product, index) => (
-                <div className="col-md-3 " key={index}>
-                    <div className="card" style={{ width: '15rem', height: '20rem' }}>
-                        <img
-                            className="card-img-top"
-                            src={`${IMG_URL}/public/product-images/${product.item}.jpg`} 
-                            alt="Product"
-                            style={{ height: '15rem' }}
-                        />
-                        <div className="card-body">
-                            <h5 className="card-title">{product.Name}</h5>
-                            <p className="card-text">{product.Category}</p>
-                            <p className="card-text">Rs: {product.Price}</p>
-                            <p className="card-text">Quantity: {product.quantity}</p>
+            <div className="row">
+                {products ? products.map((product, index) => (
+                    <div className="col-md-3 " key={index}>
+                        <div className="card" style={{ width: '15rem', height: '20rem' }}>
+                            <img
+                                className="card-img-top"
+                                src={`${IMG_URL}/public/product-images/${product.item}.jpg`}
+                                alt="Product"
+                                style={{ height: '15rem' }}
+                            />
+                            <div className="card-body">
+                                <h5 className="card-title">{product.Name}</h5>
+                                <p className="card-text">{product.Category}</p>
+                                <p className="card-text">Rs: {product.Price}</p>
+                                <p className="card-text">Quantity: {product.quantity}</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )) : ''}
-            
-        </div>
+                )) : ''}
+
+            </div>
         </div>
     );
 };
@@ -94,8 +93,8 @@ const OrderPage = () => {
                 setProducts(response.data.products); // Set products state
                 setOrderTrack(response.data.ordertrack); // Set order tracking state
                 setLoading(false); // Disable loading after fetching data
-                console.log('data products',products);
-                
+                console.log('data products', products);
+
             } catch (error) {
                 console.error('Error fetching order details:', error);
                 setLoading(false); // Disable loading in case of error
@@ -106,13 +105,22 @@ const OrderPage = () => {
     }); // Re-run when the Id changes
 
     if (loading) {
-        return <div>Loading...</div>; // Show a loading indicator
+        return <div className="con">
+         <div className="loading-spinner">
+        <div className="spinner-segment"></div>
+        <div className="spinner-segment"></div>
+        <div className="spinner-segment"></div>
+        </div>
+        </div>
+  
+   ; // Show a loading indicator
     }
 
     return (
         <section>
-            <OrderTracking orderTrack={orderTrack} />  {/* Display Order Tracking */}
+                <OrderTracking orderTrack={orderTrack} />  {/* Display Order Tracking */}
             <ProductCard products={products} />         {/* Display Ordered Products */}
+
         </section>
     );
 };

@@ -1,11 +1,12 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {BASE_URL} from '../Urls/Urls';
+import { BASE_URL } from '../Urls/Urls';
 import { User, Lock, Phone, ShoppingCart } from 'lucide-react';
 import './Signup.css';  // Import the CSS file
 
 const Signup = ({ setUser }) => {
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     Name: '',
     Mobile: '',
@@ -50,25 +51,30 @@ const Signup = ({ setUser }) => {
       setInfo('Password must be at least 4 characters');
       return false;
     }
-
+    
     return true;
   };
 
   const handleSubmit = (e) => {
+    setLoading(true)
     e.preventDefault();
 
     if (!validateForm()) {
+      setLoading(false)
       return;
     }
-
+     
     axios.post(`${BASE_URL}/signup`, formData, { withCredentials: true }).then((response) => {
       if (response.data.status) {
         const userData = { Name: formData.Name };
         setUser(userData);
         navigate('/');
+        setLoading(false)
       } else {
         setInfo('This number is already taken');
+        setLoading(false)
         navigate('/signup');
+       
       }
     });
   };
@@ -159,7 +165,16 @@ const Signup = ({ setUser }) => {
             </Link>
 
             <button type="submit" className="submit-button">
-              Sign Up
+              {loading ?
+                <div className="loading-spinner">
+
+                  <div className="spinner-segment"></div>
+                  <div className="spinner-segment"></div>
+                  <div className="spinner-segment"></div>
+                </div>
+                :
+                "Sign Up"}
+
             </button>
           </form>
         </div>
