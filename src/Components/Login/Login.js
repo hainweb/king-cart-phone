@@ -132,15 +132,13 @@ const Login = ({ setUser, setCartCount }) => { // Receive setCartCount prop
 
             <button type="submit" className="submit-button"> 
               {loading? 
-             <div className="loading-spinner">
-                    
-             <div className="spinner-segment"></div>
-             <div className="spinner-segment"></div>
-             <div className="spinner-segment"></div>
-           </div> 
-             
+                 <div className="load-3">
+                  <div className="line"></div>
+                  <div className="line"></div>
+                  <div className="line"></div>
+                </div>
             
-            : Login } Login
+            : 'Login' } 
             </button>
           </form>
         </div>
