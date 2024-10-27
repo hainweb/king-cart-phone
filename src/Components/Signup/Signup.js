@@ -166,14 +166,12 @@ const Signup = ({ setUser }) => {
 
             <button type="submit" className="submit-button">
               {loading ?
-                <div className="loading-spinner">
-
-                  <div className="spinner-segment"></div>
-                  <div className="spinner-segment"></div>
-                  <div className="spinner-segment"></div>
+                <div className="load-3">
+                  <div className="line"></div>
+                  <div className="line"></div>
+                  <div className="line"></div>
                 </div>
-                :
-                "Sign Up"}
+              :  "Sign Up"}
 
             </button>
           </form>
