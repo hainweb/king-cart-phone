@@ -13,8 +13,7 @@ const ProductList = ({ setCartCount }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [wishlistLoadingId, setWishlistLoadingId] = useState(null);
     const [sortOption, setSortOption] = useState('');
-    const [visibleProductsCount, setVisibleProductsCount] = useState(8); // Set initial visible product count
-    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [visibleProductsCount, setVisibleProductsCount] = useState(8);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -83,40 +82,15 @@ const ProductList = ({ setCartCount }) => {
             return 0;
         });
 
-    const currentProducts = sortedProducts.slice(0, visibleProductsCount); // Show products based on visible count
+    const currentProducts = sortedProducts.slice(0, visibleProductsCount);
 
     const loadMoreProducts = () => {
-        setVisibleProductsCount(prevCount => prevCount + 8); // Load 8 more products
+        setVisibleProductsCount(prevCount => prevCount + 8);
     };
-
-    // Optional: Show browser notifications for low stock
-    useEffect(() => {
-        const checkLowStock = () => {
-            products.forEach((product) => {
-                if (product.Quantity > 0 && product.Quantity < 5) {
-                    new Notification('Low Stock Alert', {
-                        body: `Only ${product.Quantity} left of ${product.Name}`,
-                        icon: `${IMG_URL}/public/product-images/${product._id}.jpg`,
-                    });
-                }
-            });
-        };
-
-        if (Notification.permission === 'granted') {
-            checkLowStock();
-        } else if (Notification.permission !== 'denied') {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    checkLowStock();
-                }
-            });
-        }
-    }, [products]);
 
     return (
         <section className="premium-product-section">
             <div className="container mt-3">
-                {/* Search input */}
                 <div className="search-bar mb-3">
                     <input
                         type="text"
@@ -127,7 +101,6 @@ const ProductList = ({ setCartCount }) => {
                     />
                 </div>
 
-                {/* Sort dropdown */}
                 <div className="sort-bar mb-3">
                     <select
                         className="form-select"
@@ -238,7 +211,6 @@ const ProductList = ({ setCartCount }) => {
                             )}
                         </div>
 
-                        {/* Load More Products Button */}
                         {visibleProductsCount < sortedProducts.length && (
                             <div className="load-more-container text-center">
                                 <button className="btn btn-load-more" onClick={loadMoreProducts}>
@@ -249,33 +221,6 @@ const ProductList = ({ setCartCount }) => {
                     </>
                 )}
             </div>
-
-            {/* Quick View Modal */}
-            {selectedProduct && (
-                <div className="quick-view-modal">
-                    <div className="modal-content">
-                        <span className="close" onClick={() => setSelectedProduct(null)}>&times;</span>
-                        <div className="modal-image-container">
-                            <img
-                                className="modal-product-image"
-                                src={`${IMG_URL}/public/product-images/${selectedProduct._id}.jpg`}
-                                alt={selectedProduct.Name}
-                            />
-                        </div>
-                        <h5 className="modal-product-title">{selectedProduct.Name}</h5>
-                        <p className="modal-product-description">{selectedProduct.Description}</p>
-                        <span className="modal-price">Price: ₹{selectedProduct.Price}</span>
-                        <div className="modal-action">
-                            <button
-                                className="btn add-to-cart-btn"
-                                onClick={() => addToCart(selectedProduct._id)}
-                            >
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </section>
     );
 };
