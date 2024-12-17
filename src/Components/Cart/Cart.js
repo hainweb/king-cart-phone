@@ -36,7 +36,7 @@ const Cart = ({ products = [], user, setCartCount }) => {
         );
     }
 
-    const incCartQuantity = async (cartId, proId, userId, count) => {
+    const incCartQuantity = async (cartId, proId, userId, count,stock) => {
         const currentQuantity = cartProducts.find(
             (p) => p.product._id === proId
         ).quantity;
@@ -51,6 +51,7 @@ const Cart = ({ products = [], user, setCartCount }) => {
                 user: userId,
                 count: count,
                 quantity: currentQuantity,
+                stockQuantity:stock
             }, { withCredentials: true });
 
             if (response.data.removeProduct) {
@@ -163,7 +164,7 @@ const Cart = ({ products = [], user, setCartCount }) => {
                                                 <button style={{display:'flex' , alignItems:'center',justifyContent:'center'}}
                                                     className="btn btn-plus"
                                                     onClick={() =>
-                                                        incCartQuantity(item._id, item.product._id, user, 1)
+                                                        incCartQuantity(item._id, item.product._id, user, 1,item.product.Quantity)
                                                     }
                                                     disabled={AddingProductId === item.product._id}
                                                 >
