@@ -173,6 +173,7 @@ const Cart = ({ products = [], user, setCartCount }) => {
                                                         '+'
                                                     )}
                                                 </button>
+                                                    <p>{item.product.Quantity}</p>
                                             </div>
                                         </div>
                                         <div className="cart-item-total">
