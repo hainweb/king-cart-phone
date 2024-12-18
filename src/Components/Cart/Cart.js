@@ -180,9 +180,9 @@ const Cart = ({ products = [], user, setCartCount }) => {
                                                         '+'
                                                     )}
                                                 </button>
-                                            {stockmax? 
+                                            (stockmax? 
                                             <p>Max quantity </p> : 
-                                            } <p>{item.product.Quantity}</p>
+                                            ) <p>{item.product.Quantity}</p>
                                             </div>
                                         </div>
                                         <div className="cart-item-total">
