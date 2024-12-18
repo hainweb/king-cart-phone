@@ -172,7 +172,7 @@ const Cart = ({ products = [], user, setCartCount }) => {
                                                     onClick={() =>
                                                         incCartQuantity(item._id, item.product._id, user, 1,item.product.Quantity)
                                                     }
-                                                    disabled={AddingProductId === item.product._id || stockmax }
+                                                    disabled={AddingProductId === item.product._id || item.product.Quantity===item.quantity }
                                                 >
                                                     {AddingProductId === item.product._id ? (
                                                         <div className="spinner"></div> // You can style this as a loading spinner
