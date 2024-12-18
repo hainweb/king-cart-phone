@@ -10,6 +10,7 @@ const Cart = ({ products = [], user, setCartCount }) => {
     const [loading, setLoading] = useState(true);
     const [AddingProductId, setAddingProductId] = useState(null); // Track loading per product
     const [DecProductId, setDecProductId] = useState(null); // Track loading per product
+    const [stockmax,setStockmax ]=useState(false);
 
     useEffect(() => {
         setTotal(calculateTotal(cartProducts));
@@ -32,26 +33,31 @@ const Cart = ({ products = [], user, setCartCount }) => {
     function calculateTotal(products) {
         return products.reduce(
             (sum, product) => sum + product.quantity * product.product.Price,
-            0 // Remove shipping amount from total calculation
+            0 // Remove shipping amount from total //calculation
         );
     }
-
+   
     const incCartQuantity = async (cartId, proId, userId, count,stock) => {
         const currentQuantity = cartProducts.find(
             (p) => p.product._id === proId
         ).quantity;
 
-        // Set the loading state for the product being updated
+        // Set the loading state for the product being updat
         setAddingProductId(proId);
-
+        
+        
+       if(currentQuantity==stock){
+           setStockmax(true)
+       }else{
+       
+   
         try {
             const response = await axios.post(`${BASE_URL}/change-productQuantity`, {
                 cart: cartId,
                 product: proId,
                 user: userId,
                 count: count,
-                quantity: currentQuantity,
-                stockQuantity:stock
+                quantity: currentQuantity
             }, { withCredentials: true });
 
             if (response.data.removeProduct) {
@@ -67,12 +73,12 @@ const Cart = ({ products = [], user, setCartCount }) => {
                             ? { ...item, quantity: item.quantity + count }
                             : item
                     )
-                );
+                )
             }
         } catch (error) {
             console.error('Error updating quantity:', error);
         }
-
+}
         // Remove the loading state after the quantity is updated
         setAddingProductId(null);
     };
@@ -166,7 +172,7 @@ const Cart = ({ products = [], user, setCartCount }) => {
                                                     onClick={() =>
                                                         incCartQuantity(item._id, item.product._id, user, 1,item.product.Quantity)
                                                     }
-                                                    disabled={AddingProductId === item.product._id}
+                                                    disabled={AddingProductId === item.product._id && stockmax }
                                                 >
                                                     {AddingProductId === item.product._id ? (
                                                         <div className="spinner"></div> // You can style this as a loading spinner
@@ -174,7 +180,9 @@ const Cart = ({ products = [], user, setCartCount }) => {
                                                         '+'
                                                     )}
                                                 </button>
-                                                    <p>{item.product.Quantity}</p>
+                                            {stockmax? 
+                                            <p>Max quantity </p> : 
+                                            } <p>{item.product.Quantity}</p>
                                             </div>
                                         </div>
                                         <div className="cart-item-total">
