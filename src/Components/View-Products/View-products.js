@@ -53,7 +53,7 @@ const ProductList = ({ setCartCount }) => {
 
     const addToCart = (productId) => {
         setAddingToCartProductId(productId);
-        setAlreadycartproduct(productId):
+        setAlreadycartproduct(productId);
         axios.get(`${BASE_URL}/add-to-cart/${productId}`, { withCredentials: true })
             .then(response => {
                 console.log(response)
