@@ -14,7 +14,7 @@ const ProductList = ({ setCartCount }) => {
     const [wishlistLoadingId, setWishlistLoadingId] = useState(null);
     const [sortOption, setSortOption] = useState('');
     const [visibleProductsCount, setVisibleProductsCount] = useState(8);
-    const [alreadycart,setAlreadycart]=usestate('');
+    const [alreadycart,setAlreadycart]=useState('');
 
     useEffect(() => {
         const fetchProducts = async () => {
