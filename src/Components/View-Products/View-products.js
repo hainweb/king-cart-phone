@@ -196,7 +196,7 @@ const ProductList = ({ setCartCount }) => {
                                                                     alreadycart? (
                                                                     alreadycartproduct === product._id?(
                                                                     <i className="fas fa-shopping-cart"> {alreadycart}</i>
-                                                                    ) : null ):(
+                                                                    ) : (<i className="fas fa-shopping-cart"> Add to cart</i>) ):(
                                                                      <i className="fas fa-shopping-cart"> Add to cart</i>
                                                                         )
                                                                     
