@@ -14,6 +14,7 @@ const ProductList = ({ setCartCount }) => {
     const [wishlistLoadingId, setWishlistLoadingId] = useState(null);
     const [sortOption, setSortOption] = useState('');
     const [visibleProductsCount, setVisibleProductsCount] = useState(8);
+    const [alreadycart,setAlreadycart]=usestate('');
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -53,8 +54,12 @@ const ProductList = ({ setCartCount }) => {
         setAddingToCartProductId(productId);
         axios.get(`${BASE_URL}/add-to-cart/${productId}`, { withCredentials: true })
             .then(response => {
+                console.log(response)
                 if (response.data.status) {
                     setCartCount(prevCount => prevCount + 1);
+                }
+                if (response.data.message){
+                    setAlreadycart(response.data.message)
                 }
             })
             .catch(error => {
