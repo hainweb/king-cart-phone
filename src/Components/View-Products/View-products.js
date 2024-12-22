@@ -15,6 +15,7 @@ const ProductList = ({ setCartCount }) => {
     const [sortOption, setSortOption] = useState('');
     const [visibleProductsCount, setVisibleProductsCount] = useState(8);
     const [alreadycart,setAlreadycart]=useState('');
+    const [alreadycartproduct,setAlreadycartproduct]= useState('');
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -52,6 +53,7 @@ const ProductList = ({ setCartCount }) => {
 
     const addToCart = (productId) => {
         setAddingToCartProductId(productId);
+        setAlreadycartproduct(productId):
         axios.get(`${BASE_URL}/add-to-cart/${productId}`, { withCredentials: true })
             .then(response => {
                 console.log(response)
