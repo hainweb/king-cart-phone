@@ -191,9 +191,10 @@ const ProductList = ({ setCartCount }) => {
                                                                 {addingToCartProductId === product._id ? (
                                                                    <div style={{ borderLeftColor: 'white'}} className="spinner"></div>
                                                                 ) : (
-                                                                    alreadycart ? (
+                                                                    alreadycart? (
+                                                                    alreadycartproduct === product._id?(
                                                                     <i className="fas fa-shopping-cart"> {alreadycart}</i>
-                                                                     ):(
+                                                                    ) ):(
                                                                      <i className="fas fa-shopping-cart"> Add to cart</i>
                                                                         )
                                                                     
