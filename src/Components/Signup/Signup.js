@@ -66,8 +66,8 @@ const Signup = ({ setUser }) => {
      
     axios.post(`${BASE_URL}/signup`, formData, { withCredentials: true }).then((response) => {
       if (response.data.status) {
-        const userData = { response.data.user };
-        setUser(userData);
+        
+        setUser(response.data.user);
         navigate('/');
         setLoading(false)
       } else {
